@@ -8,7 +8,7 @@ class ListaEnlazada:
         nuevo_nodo.siguiente = self.cabeza
         self.cabeza = nuevo_nodo
 
-    def buscar(self, nombre_piso):
+    def buscar_piso(self, nombre_piso):
         actual = self.cabeza
         while actual:
             if actual.dato.nombre == nombre_piso:
