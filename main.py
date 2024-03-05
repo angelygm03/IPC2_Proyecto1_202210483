@@ -2,11 +2,12 @@ import xml.etree.ElementTree as ET
 from graphviz import Digraph
 from NodoPiso import NodoPiso
 from ListaPisos import ListaPisos
+from ListaEnlazada import ListaEnlazada
 
 def read_xml(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
-    lista_pisos = ListaPisos()
+    lista_pisos = ListaEnlazada()
     for piso in root.findall('piso'):
         nombre = piso.get('nombre')
         R = int(piso.find('R').text)
@@ -18,22 +19,15 @@ def read_xml(filename):
             codigo = patron.get('codigo')
             patron_data = patron.text.strip()
             patrones.append((codigo, patron_data))
-        lista_pisos.agregar_piso(nombre, R, C, F, S, patrones)
+        nuevo_piso = NodoPiso(nombre, R, C, F, S, patrones)
+        lista_pisos.agregar(nuevo_piso)
     return lista_pisos
 
-def generate_graphviz(pisos):
-    actual = pisos.cabeza
-    while actual:
-        nombre = actual.nombre
-        R = actual.R
-        C = actual.C
-        patrones = actual.patrones
-        for patron in patrones:
-            codigo, patron_data = patron
-            dot = Digraph(comment=f'Piso: {nombre} - Código: {codigo}')
-            dot.node('tab', label=f'<<TABLE>{generate_table(patron_data, R, C)}</TABLE>>', shape='none')
-            dot.render(f'piso_{nombre}_{codigo}', format='png', cleanup=True)
-        actual = actual.siguiente
+
+def generate_graphviz(patron_data, R, C, nombre_piso, codigo_patron, file_name):
+    dot = Digraph(comment=f'Piso: {nombre_piso} - Código: {codigo_patron}')
+    dot.node('tab', label=f'<<TABLE>{generate_table(patron_data, R, C)}</TABLE>>', shape='none')
+    dot.render(file_name, format='png', cleanup=True)
 
 def generate_table(patron_data, R, C):
     table = ""
@@ -47,5 +41,16 @@ def generate_table(patron_data, R, C):
 
 if __name__ == "__main__":
     filename = input("Ingrese el nombre del archivo XML: ")
-    pisos = read_xml(filename)
-    generate_graphviz(pisos)
+    lista_pisos = read_xml(filename)
+
+    actual = lista_pisos.cabeza
+    while actual:
+        nombre_piso = actual.dato.nombre
+        print(f"Piso: {actual.dato.nombre}")
+        for codigo_patron, patron_data in actual.dato.patrones:
+            R = actual.dato.R
+            C = actual.dato.C
+            generate_graphviz(patron_data, R, C, nombre_piso, codigo_patron, f'piso_{nombre_piso}_{codigo_patron}.png')
+            print(f"- Código de Patrón: {codigo_patron}")
+            print(f"  {patron_data}")
+        actual = actual.siguiente

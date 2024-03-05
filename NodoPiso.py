@@ -6,4 +6,3 @@ class NodoPiso:
         self.F = F
         self.S = S
         self.patrones = patrones
-        self.siguiente = None
