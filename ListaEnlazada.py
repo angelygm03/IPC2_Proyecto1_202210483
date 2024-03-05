@@ -5,13 +5,18 @@ class ListaEnlazada:
 
     def agregar(self, dato):
         nuevo_nodo = NodoDato(dato)
-        nuevo_nodo.siguiente = self.cabeza
-        self.cabeza = nuevo_nodo
+        if self.cabeza is None:
+            self.cabeza = nuevo_nodo
+        else:
+            actual = self.cabeza
+            while actual.siguiente is not None:
+                actual = actual.siguiente
+            actual.siguiente = nuevo_nodo
 
     def buscar_piso(self, nombre_piso):
         actual = self.cabeza
         while actual:
             if actual.dato.nombre == nombre_piso:
-                return actual.dato
+                return actual 
             actual = actual.siguiente
         return None
